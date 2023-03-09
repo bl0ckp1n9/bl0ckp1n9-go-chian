@@ -7,11 +7,11 @@ import (
 	"text/template"
 
 	"github.com/bl0ckp1n9/bl0ckp1n9chain/blockchain"
+	"github.com/gorilla/mux"
 )
 var templates *template.Template
 
 const (
-	port        string = ":4000"
 	templateDir string = "explorer/templates/"
 )
 
@@ -39,12 +39,15 @@ func add(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Start() {
+func Start(aPort int) {
+	// handler := http.NewServeMux()
+	router := mux.NewRouter()
 	// all of templates files update
 	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
 	templates = template.Must(templates.ParseGlob(templateDir + "partials/*.gohtml"))
-	http.HandleFunc("/", home)
-	http.HandleFunc("/add", add)
+	port := fmt.Sprintf(":%d",aPort)
+	router.HandleFunc("/", home)
+	router.HandleFunc("/add", add)
 	fmt.Printf("Listening on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServe(port, router))
 }
